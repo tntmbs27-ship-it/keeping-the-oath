@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>נתיב דרך - מעקב הרגלים והתגברות</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Heebo', 'Rubik', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+        }
+        .pulse-glow {
+            box-shadow: 0 0 20px rgba(2, 132, 199, 0.4);
+            animation: pulse-animation 2s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0px rgba(2, 132, 199, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(2, 132, 199, 0); }
+            100% { box-shadow: 0 0 0 0px rgba(2, 132, 199, 0); }
+        }
+        .breathe-circle {
+            animation: breathe 8s infinite ease-in-out;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); background-color: #0284c7; }
+            50% { transform: scale(1.4); background-color: #38bdf8; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
+                        <i class="fa-solid fa-mountain"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-tight">נתיב דרך</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">חופש, מודעות והתפתחות אישית</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Emergency SOS Button -->
+                    <button onclick="openSosModal()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-2 shadow-md hover:shadow-lg transition-all animate-bounce">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>חרום SOS</span>
+                    </button>
+                    <!-- Dark/Light Theme Toggle -->
+                    <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+                        <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Banner Motivation / Daily Quote -->
+        <div class="bg-gradient-to-r from-slate-900 via-sky-950 to-indigo-950 text-white p-6 rounded-3xl shadow-xl relative overflow-hidden border border-sky-800/40">
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-sky-500/10 rounded-full blur-2xl"></div>
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="inline-block bg-sky-500/20 text-sky-300 text-xs font-semibold px-3 py-1 rounded-full mb-2 border border-sky-400/30">תזכורת יומית</span>
+                    <h2 id="daily-quote" class="text-lg md:text-xl font-semibold leading-relaxed">"חופש אינו היעדר תשוקה, אלא השליטה בה."</h2>
+                    <p class="text-xs text-slate-400 mt-1">כל שניה שאתה בוחר בעצמך – אתה בונה גרסה חזקה יותר של מי שאתה.</p>
+                </div>
+                <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10 self-stretch md:self-auto justify-center">
+                    <i class="fa-solid fa-fire text-amber-400 text-2xl"></i>
+                    <div class="text-right">
+                        <div class="text-xs text-slate-300">ניקוד XP נצבר</div>
+                        <div id="total-xp" class="text-xl font-bold text-amber-400">0 XP</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid: Timer & Stats -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Main Live Counter Card -->
+            <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 dark:border-slate-700/80 flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-sky-600 dark:text-sky-400">מונולוג הרצף הנוכחי</span>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white">זמן ניקיון משוער</h3>
+                        </div>
+                        <span id="rank-badge" class="px-3 py-1 bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 text-sm font-bold rounded-full border border-sky-200 dark:border-sky-800">
+                            מתחיל במסע 🌿
+                        </span>
+                    </div>
+
+                    <!-- Counter Numbers Grid -->
+                    <div class="grid grid-cols-4 gap-2 sm:gap-4 my-6 text-center">
+                        <div class="bg-slate-50 dark:bg-slate-900/60 p-3 sm:p-5 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <div id="cnt-days" class="text-3xl sm:text-5xl font-black text-sky-600 dark:text-sky-400">0</div>
+                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">ימים</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-900/60 p-3 sm:p-5 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <div id="cnt-hours" class="text-3xl sm:text-5xl font-black text-slate-800 dark:text-slate-100">00</div>
+                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">שעות</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-900/60 p-3 sm:p-5 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <div id="cnt-minutes" class="text-3xl sm:text-5xl font-black text-slate-800 dark:text-slate-100">00</div>
+                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">דקות</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-900/60 p-3 sm:p-5 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <div id="cnt-seconds" class="text-3xl sm:text-5xl font-black text-rose-500 dark:text-rose-400">00</div>
+                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">שניות</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar to Next Level -->
+                    <div class="space-y-2 mt-6">
+                        <div class="flex justify-between text-xs font-semibold text-slate-600 dark:text-slate-400">
+                            <span>התקדמות ליעד הבא (<span id="next-milestone-name">יום 1</span>)</span>
+                            <span id="milestone-percent">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                            <div id="milestone-bar" class="bg-gradient-to-r from-sky-500 to-emerald-500 h-3 rounded-full transition-all duration-500 w-0"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex flex-wrap sm:flex-nowrap gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-700">
+                    <button onclick="claimDailyCheckin()" id="btn-checkin" class="w-full sm:w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-sm transition">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>דיווחי הצלחה יומי (+50 XP)</span>
+                    </button>
+                    <button onclick="openRelapseModal()" class="w-full sm:w-1/2 bg-slate-100 dark:bg-slate-700 hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-700 dark:text-slate-200 hover:text-rose-600 dark:hover:text-rose-400 font-semibold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 transition border border-slate-200 dark:border-slate-600">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>דיווח מעידה / איפוס</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats & Level Summary Side Card -->
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200/80 dark:border-slate-700/80 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">סיכום סטטיסטי</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                                    <i class="fa-solid fa-crown"></i>
+                                </div>
+                                <span class="text-sm font-medium">שיא אישי (Streak)</span>
+                            </div>
+                            <span id="stat-max-streak" class="font-bold text-slate-800 dark:text-slate-100">0 ימים</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+                                <span class="text-sm font-medium">סה"כ מעידות (Strikes)</span>
+                            </div>
+                            <span id="stat-total-relapses" class="font-bold text-slate-800 dark:text-slate-100">0</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                                    <i class="fa-solid fa-brain"></i>
+                                </div>
+                                <span class="text-sm font-medium">טריגר שכיח ביותר</span>
+                            </div>
+                            <span id="stat-common-trigger" class="text-xs font-bold bg-slate-200 dark:bg-slate-700 px-2.5 py-1 rounded-lg">אין נתונים</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 rounded-2xl bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50">
+                    <h4 class="text-xs font-bold text-sky-800 dark:text-sky-300 uppercase tracking-wide">תובנה אישית מהירה</h4>
+                    <p id="insight-text" class="text-xs text-sky-900 dark:text-sky-200 mt-1 leading-relaxed">
+                        התחלות הן תמיד החלק המאתגר ביותר. המוח שלך מתחיל להסתגל לכימיקלים מאוזנים יותר. המשך כך!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Milestones Badges Section -->
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 dark:border-slate-700/80">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">אבני דרך והישגים</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">ככל שתשמור על הרצף, תפתח תגים ותעלה בדרגות ההתפתחות.</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4" id="badges-container">
+                <!-- Badges dynamically rendered via JS -->
+            </div>
+        </div>
+
+        <!-- Tips, Warnings, Alternatives & Psychology Section -->
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 dark:border-slate-700/80">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">מדריך כלים, אזהרות ותובנות</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">כל מה שצריך לדעת כדי לנצח את ההרגל ולהבין את המנגנון המוחי.</p>
+                </div>
+                <!-- Navigation Tabs -->
+                <div class="flex gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl text-xs font-semibold">
+                    <button onclick="switchTab('tips')" id="tab-btn-tips" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-sm transition">עצות ופרקטיקה</button>
+                    <button onclick="switchTab('warnings')" id="tab-btn-warnings" class="px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 transition">אזהרות וסכנות</button>
+                    <button onclick="switchTab('habits')" id="tab-btn-habits" class="px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 transition">תחליפים בריאים</button>
+                </div>
+            </div>
+
+            <!-- Tab Content 1: Practical Tips -->
+            <div id="tab-tips" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-700/60">
+                        <div class="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/60 text-sky-600 dark:text-sky-300 flex items-center justify-center text-lg font-bold mb-3">
+                            <i class="fa-solid fa-bed"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">חוק "הטלפון מחוץ לחדר"</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">רוב המעידות קורות במיטה לפני השינה או בבוקר. הרחק את הנייד מאזור השינה והשתמש בשעון מעורר רגיל.</p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-700/60">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-300 flex items-center justify-center text-lg font-bold mb-3">
+                            <i class="fa-solid fa-shower"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">מקלחת קרה מיידית</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">כשגל תשוקה מגיע, מים קרים מעבירים את מוחך למצב הישרדותי ומאפסים מחדש את המערכת העצבית באופן מידי.</p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-700/60">
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300 flex items-center justify-center text-lg font-bold mb-3">
+                            <i class="fa-solid fa-stopwatch"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">חוק 15 הדקות (Urge Surfing)</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">דחף אינו קבוע, הוא כמו גל שמגיע לשיא ונעלם. הבטח לעצמך לחכות רק 15 דקות מבלי לפעול. הכל יירגע.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Warnings -->
+            <div id="tab-warnings" class="hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30">
+                        <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-300 flex items-center justify-center text-lg font-bold mb-3">
+                            <i class="fa-solid fa-arrow-trend-down"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">אפקט ה-Chaser (גל חזק לאחר מעידה)</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">ב-24 עד 48 השעות שלאחר נפילה, המוח יבקש עוד דופמין בעוצמה גבוהה. הישאר בדריכות שיא מיד לאחר מעידה.</p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-600 dark:text-amber-300 flex items-center justify-center text-lg font-bold mb-3">
+                            <i class="fa-solid fa-eye text-lg"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">זהירות מ-"רק להציץ"</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">המוח מנסה לשכנע אותך שפתיחת תמונה קטנה או סרטון קצר לא תזיק. 99% מאירועי ה"הצצה" מסתיימים בנפילה מלאה.</p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-300 flex items-center justify-center text-lg font-bold mb-3">
+                            <i class="fa-solid fa-battery-quarter"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">עייפות, שעמום ובדדות (HALT)</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">ראשי תיבות: Hungry, Angry, Lonely, Tired. כשאחד המצבים הללו מתקיים, רמת כוח הרצון יורדת דרסטית.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 3: Healthy Alternatives -->
+            <div id="tab-habits" class="hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-300 flex items-center justify-center text-lg font-bold mb-3">
+                            <i class="fa-solid fa-dumbbell"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">אימון גופני עצים</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">הרמת משקולות, שוט שרירים או ריצה מייצרים אנדורפינים בריאים ומפרקים אנרגיה מינית כלואה בחזרה לגוף.</p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+                        <div class="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/60 text-sky-600 dark:text-sky-300 flex items-center justify-center text-lg font-bold mb-3">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">למידת מיומנות חדשה</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">המוח מחפש גירוי וחידוש. תיעול הסקרנות ללימוד שפה, תכנות, נגינה או קריאה בונה קשרים נוירולוגיים חדשים.</p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-600 dark:text-amber-300 flex items-center justify-center text-lg font-bold mb-3">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">יציאה לסביבה חברתית</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">שב בסלון עם משפחה, צא לבית קפה או פגוש חברים. נוכחות ליד אנשים מונעת לחלוטין התנהגות כפייתית.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relapse Log & Reflection (Strikes) -->
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 dark:border-slate-700/80">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">היסטוריית מעידות ומסקנות (Relapse Log)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">מעידה אינה כישלון - היא מידע ללמידה. תעד אותה כדי להבין טריגרים ולמנוע את הפעם הבאה.</p>
+
+            <div id="relapses-list" class="space-y-3">
+                <!-- Dynamically populated or empty state -->
+            </div>
+        </div>
+    </main>
+
+    <!-- SOS EMERGENCY MODAL -->
+    <div id="modal-sos" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 max-w-xl w-full rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-3 text-rose-500">
+                    <i class="fa-solid fa-shield-halved text-2xl"></i>
+                    <h3 class="text-2xl font-black">ערכת עזרה ראשונה לעצירת הדחף</h3>
+                </div>
+                <button onclick="closeSosModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl font-bold">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Breathing Exercise Tool -->
+            <div class="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 text-center mb-6">
+                <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-2">תרגיל נשימה להרגעת הדחף (Box Breathing)</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">עקוב אחר המעגל. קח אוויר, החזק, ושחרר לאט.</p>
+
+                <div class="relative w-28 h-28 mx-auto flex items-center justify-center my-4">
+                    <div class="w-20 h-20 rounded-full breathe-circle text-white flex items-center justify-center text-xs font-bold shadow-lg">
+                        <span id="breath-status">לשאוף...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grounding Exercise 5-4-3-2-1 -->
+            <div class="space-y-3 mb-6">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">תרגיל קרקוע 5-4-3-2-1 (נתק את המחשבה):</h4>
+                <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2">
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> <strong>5 דברים:</strong> הבט סביבך ומצא 5 חפצים בצבע כחול/חום.</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> <strong>4 דברים:</strong> גע ב-4 מרקמים שונים (שולחן, בגד, קיר, מים).</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> <strong>3 צלילים:</strong> הקשב וזהה 3 קולות ברקע.</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> <strong>2 ריחות:</strong> הסנף ריח של קפה, סבון או אוויר צח.</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> <strong>1 תנועה:</strong> עשה 10 שקילת שרירים / שקילת אגרוף חזקה.</li>
+                </ul>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeSosModal()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl transition">
+                    עברתי את הגל! אני ממשיך ברצף 💪
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RELAPSE MODAL (STRIKE LOG) -->
+    <div id="modal-relapse" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 max-w-lg w-full rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-700">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">תיעוד מעידה ואיפוס</h3>
+                <button onclick="closeRelapseModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                אל תכה את עצמך. מעידה היא לא אפס למידה. מה שהכי חשוב עכשיו זה לקום חזרה ולנתח את הגורם.
+            </p>
+
+            <form id="relapse-form" onsubmit="handleRelapseSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">מה היה הטריגר המרכזי?</label>
+                    <select id="relapse-trigger" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-sm">
+                        <option value="שעמום">שעמום וחוסר מעש</option>
+                        <option value="לחץ וחרדה">לחץ, עומס או חרדה</option>
+                        <option value="עייפות">עייפות מאוחר בלילה / בבוקר</option>
+                        <option value="חשיפה ברשת">חשיפה מקרית ברשת/רשתות חברתיות</option>
+                        <option value="בדידות">בדידות או תסכול רגשי</option>
+                        <option value="אחר">אחר</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">מסקנה או תובנה להמשך (איך תמנע זאת בפעם הבאה?):</label>
+                    <textarea id="relapse-note" rows="3" required placeholder="דוגמה: להוריד אינסטגרם מהטלפון אחרי השעה 22:00..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl transition shadow-md">
+                        אפס מונה והתחל מחדש 🚀
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- App Logic Script -->
+    <script>
+        // Data State
+        let state = {
+            startDate: new Date().toISOString(),
+            xp: 0,
+            maxStreakDays: 0,
+            relapses: [],
+            lastCheckinDate: null
+        };
+
+        // Milestone Ranks Definitions
+        const MILESTONES = [
+            { days: 1, name: "יום 1 - צעד ראשון", badge: "🌱", rank: "נבט צעיר" },
+            { days: 3, name: "3 ימים - תנופה", badge: "🌿", rank: "מתגבר מתחיל" },
+            { days: 7, name: "שבוע 1 - שבירת הרגל", badge: "🛡️", rank: "מגן הרצון" },
+            { days: 14, name: "שבועיים - איזון דופמין", badge: "⚡", rank: "נחשול של אנרגיה" },
+            { days: 30, name: "חודש 1 - שינוי נוירולוגי", badge: "🔥", rank: "לוחם מודע" },
+            { days: 60, name: "חודשיים - שליטה עמוקה", badge: "💎", rank: "מאסטר של מיינד" },
+            { days: 90, name: "90 יום - התחדשות מלאה (Rewire)", badge: "👑", rank: "חופשי לחלוטין" }
+        ];
+
+        // Quotes list
+        const QUOTES = [
+            "\"חופש אינו היעדר תשוקה, אלא השליטה בה.\"",
+            "\"הניצחון הגדול ביותר הוא הניצחון של אדם על עצמו.\"",
+            "\"אתה לא מתחיל מאפס, אתה מתחיל מניסיון.\"",
+            "\"כל פעם שאתה אומר 'לא' לדחף, אתה אומר 'כן' לעתיד שלך.\"",
+            "\"משמעת עצמית היא הגשר בין מטרות להישגים.\""
+        ];
+
+        // Load data on startup
+        window.onload = function() {
+            loadState();
+            setupRandomQuote();
+            renderBadges();
+            updateUI();
+            setInterval(updateTimer, 1000);
+        };
+
+        // Theme Toggle Logic
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.className = "fa-solid fa-sun text-lg text-amber-400";
+            } else {
+                icon.className = "fa-solid fa-moon text-lg";
+            }
+        }
+
+        // Random Quote
+        function setupRandomQuote() {
+            const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+            document.getElementById('daily-quote').innerText = q;
+        }
+
+        // Save state to LocalStorage
+        function saveState() {
+            localStorage.setItem('path_freedom_app_state', JSON.stringify(state));
+        }
+
+        // Load state from LocalStorage
+        function loadState() {
+            const saved = localStorage.getItem('path_freedom_app_state');
+            if (saved) {
+                try {
+                    state = JSON.parse(saved);
+                } catch(e) {
+                    console.error("Failed to parse state", e);
+                }
+            } else {
+                saveState();
+            }
+        }
+
+        // Timer Update loop
+        function updateTimer() {
+            const start = new Date(state.startDate);
+            const now = new Date();
+            const diff = Math.max(0, now - start);
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('cnt-days').innerText = days;
+            document.getElementById('cnt-hours').innerText = hours.toString().padStart(2, '0');
+            document.getElementById('cnt-minutes').innerText = minutes.toString().padStart(2, '0');
+            document.getElementById('cnt-seconds').innerText = seconds.toString().padStart(2, '0');
+
+            // Update Max Streak Stat
+            if (days > state.maxStreakDays) {
+                state.maxStreakDays = days;
+                saveState();
+            }
+
+            updateProgressAndBadges(days);
+            updateStatsUI(days);
+        }
+
+        // Update Progress Bar & Current Rank
+        function updateProgressAndBadges(currentDays) {
+            let nextMilestone = MILESTONES.find(m => m.days > currentDays);
+            let prevMilestoneDays = 0;
+
+            if (!nextMilestone) {
+                // Beyond 90 days
+                nextMilestone = { days: currentDays + 30, name: "המשך צמיחה", rank: "מאסטר נצחי 👑" };
+            }
+
+            // Find current active rank
+            const achievedMilestones = MILESTONES.filter(m => currentDays >= m.days);
+            const currentRankName = achievedMilestones.length > 0 
+                ? achievedMilestones[achievedMilestones.length - 1].rank 
+                : "מתחיל במסע 🌿";
+
+            document.getElementById('rank-badge').innerText = currentRankName;
+            document.getElementById('next-milestone-name').innerText = nextMilestone.name;
+
+            // Calculate percentage
+            const targetDays = nextMilestone.days;
+            const pct = Math.min(100, Math.floor((currentDays / targetDays) * 100));
+            document.getElementById('milestone-percent').innerText = `${pct}%`;
+            document.getElementById('milestone-bar').style.width = `${pct}%`;
+        }
+
+        // Update Statistics Panel
+        function updateStatsUI(currentDays) {
+            document.getElementById('total-xp').innerText = `${state.xp} XP`;
+            document.getElementById('stat-max-streak').innerText = `${state.maxStreakDays} ימים`;
+            document.getElementById('stat-total-relapses').innerText = state.relapses.length;
+
+            // Compute most common trigger
+            if (state.relapses.length > 0) {
+                const counts = {};
+                state.relapses.forEach(r => {
+                    counts[r.trigger] = (counts[r.trigger] || 0) + 1;
+                });
+                let topTrigger = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+                document.getElementById('stat-common-trigger').innerText = topTrigger;
+            } else {
+                document.getElementById('stat-common-trigger').innerText = "ללא מעידות!";
+            }
+
+            renderRelapsesList();
+        }
+
+        // Daily Checkin (Claim XP)
+        function claimDailyCheckin() {
+            const todayStr = new Date().toDateString();
+            if (state.lastCheckinDate === todayStr) {
+                alert("כבר ביצעת דיווח הצלחה יומי היום! חזור מחר 🌟");
+                return;
+            }
+
+            state.xp += 50;
+            state.lastCheckinDate = todayStr;
+            saveState();
+            updateUI();
+
+            // Trigger Confetti
+            confetti({
+                particleCount: 80,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // Render Milestones Badges Grid
+        function renderBadges() {
+            const container = document.getElementById('badges-container');
+            const start = new Date(state.startDate);
+            const now = new Date();
+            const currentDays = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+
+            container.innerHTML = MILESTONES.map(m => {
+                const isUnlocked = currentDays >= m.days;
+                return `
+                    <div class="p-4 rounded-2xl border text-center transition ${
+                        isUnlocked 
+                        ? 'bg-gradient-to-b from-sky-50 to-indigo-50 dark:from-sky-950/40 dark:to-indigo-950/40 border-sky-300 dark:border-sky-700 shadow-sm' 
+                        : 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-700/50 opacity-50 grayscale'
+                    }">
+                        <div class="text-3xl mb-1">${m.badge}</div>
+                        <div class="font-bold text-xs text-slate-900 dark:text-white">${m.days} ימים</div>
+                        <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">${m.rank}</div>
+                        ${isUnlocked ? '<span class="inline-block mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-full">הושג ✓</span>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Relapses History List
+        function renderRelapsesList() {
+            const container = document.getElementById('relapses-list');
+            if (!state.relapses || state.relapses.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <i class="fa-solid fa-heart-circle-check text-emerald-500 text-2xl mb-2"></i>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">טרם נרשמו מעידות. המשך להחזיק מעמד ולחזק את הרצף!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = state.relapses.slice().reverse().map(r => `
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded-md">טריגר: ${r.trigger}</span>
+                            <span class="text-xs text-slate-400">${new Date(r.date).toLocaleDateString('he-IL')}</span>
+                        </div>
+                        <p class="text-xs text-slate-700 dark:text-slate-300 mt-1">"${r.note}"</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            ['tips', 'warnings', 'habits'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).classList.remove('bg-white', 'dark:bg-slate-800', 'text-sky-600', 'dark:text-sky-400', 'shadow-sm');
+                document.getElementById(`tab-btn-${t}`).classList.add('text-slate-500', 'dark:text-slate-400');
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            activeBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-sky-600', 'dark:text-sky-400', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-500', 'dark:text-slate-400');
+        }
+
+        // SOS Modal
+        function openSosModal() {
+            document.getElementById('modal-sos').classList.remove('hidden');
+        }
+        function closeSosModal() {
+            document.getElementById('modal-sos').classList.add('hidden');
+        }
+
+        // Relapse Modal
+        function openRelapseModal() {
+            document.getElementById('modal-relapse').classList.remove('hidden');
+        }
+        function closeRelapseModal() {
+            document.getElementById('modal-relapse').classList.add('hidden');
+        }
+
+        // Handle Relapse Submit
+        function handleRelapseSubmit(e) {
+            e.preventDefault();
+            const trigger = document.getElementById('relapse-trigger').value;
+            const note = document.getElementById('relapse-note').value;
+
+            state.relapses.push({
+                date: new Date().toISOString(),
+                trigger: trigger,
+                note: note
+            });
+
+            // Reset start date to now
+            state.startDate = new Date().toISOString();
+            saveState();
+
+            // Clear inputs & close modal
+            document.getElementById('relapse-note').value = '';
+            closeRelapseModal();
+
+            // Update UI
+            updateUI();
+            renderBadges();
+        }
+
+        // General UI Refresh
+        function updateUI() {
+            updateTimer();
+            renderBadges();
+        }
+    </script>
+</body>
+</html>
